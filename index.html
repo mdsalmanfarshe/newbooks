@@ -1,0 +1,1386 @@
+```html
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শিশু শিক্ষা – বাংলা বর্ণমালা (Digital Learning Book)</title>
+    <!-- Font Awesome CDN for clean UI icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for crisp Bengali Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atma:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #e0f2fe;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --secondary: #f59e0b;
+            --accent: #10b981;
+            --card-border: #bae6fd;
+            --shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.15), 0 8px 10px -6px rgba(2, 132, 199, 0.1);
+            --book-spine: #0284c7;
+            --paper-bg: #fffdfa;
+            --font-size-base: 16px;
+        }
+
+        .dark-mode {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --secondary: #fbbf24;
+            --accent: #34d399;
+            --card-border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --book-spine: #0369a1;
+            --paper-bg: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-size: var(--font-size-base);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Atma', 'Hind Siliguri', cursive, sans-serif;
+        }
+
+        /* App Layout */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 10px;
+        }
+
+        /* Top Bar Navigation */
+        .top-navbar {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 15px;
+            border: 1px solid var(--card-border);
+            z-index: 100;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .brand-logo i {
+            font-size: 1.8rem;
+            color: var(--secondary);
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Book Frame & Pages Container */
+        .book-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1500px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .book-viewport {
+            width: 100%;
+            max-width: 900px;
+            min-height: 580px;
+            background: var(--paper-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--card-border);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s ease;
+        }
+
+        /* Page Slide Animation */
+        .page-content {
+            padding: 30px;
+            flex: 1;
+            display: none;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            overflow-y: auto;
+        }
+
+        .page-content.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Cover Page Styling */
+        .cover-page {
+            text-align: center;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(2,132,199,0.08) 0%, rgba(245,158,11,0.08) 100%);
+            border: 12px solid var(--primary);
+            border-radius: 20px;
+            margin: 10px;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .cover-title-box h1 {
+            font-size: 3.2rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+        }
+
+        .cover-title-box h2 {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .cover-illustration {
+            width: 220px;
+            height: 220px;
+            margin: 15px auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+        }
+
+        .author-box {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .author-box input {
+            border: none;
+            border-bottom: 2px dashed var(--primary);
+            background: transparent;
+            font-family: inherit;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            text-align: center;
+            padding: 2px 5px;
+            outline: none;
+            font-weight: 600;
+            width: 180px;
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, var(--primary), #0369a1);
+            color: white;
+            border: none;
+            padding: 16px 42px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 25px rgba(2, 132, 199, 0.45);
+        }
+
+        /* Table of Contents Grid */
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .toc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .toc-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .toc-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(2, 132, 199, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .toc-info h3 {
+            font-size: 1.25rem;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .toc-info p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        /* Letter Single View Design */
+        .letter-view-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .letter-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed var(--card-border);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .letter-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .main-letter-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 15px 0;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .big-letter-box {
+            font-size: 7rem;
+            font-weight: bold;
+            color: var(--primary);
+            background: rgba(2, 132, 199, 0.05);
+            width: 170px;
+            height: 170px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--primary);
+            box-shadow: inset 0 0 15px rgba(2, 132, 199, 0.1);
+            position: relative;
+        }
+
+        .letter-meta {
+            text-align: left;
+        }
+
+        .letter-pronunciation {
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .btn-audio-play {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-audio-play:hover {
+            transform: scale(1.05);
+            background: #059669;
+        }
+
+        .word-examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .word-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid var(--card-border);
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .word-card svg, .word-card img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+            object-fit: contain;
+        }
+
+        .word-card .word-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .word-card .word-meaning {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* Letters Grid View */
+        .letters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .grid-letter-item {
+            background: var(--bg-card);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .grid-letter-item:hover {
+            border-color: var(--primary);
+            transform: scale(1.08);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 6px 15px rgba(2,132,199,0.25);
+        }
+
+        /* Kar Chinha Table / Cards */
+        .kar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .kar-card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .kar-symbol {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--secondary);
+            background: rgba(245, 158, 11, 0.1);
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Sentence / Story Cards */
+        .sentence-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .sentence-illustration {
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+        }
+
+        .sentence-text h3 {
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .sentence-text p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* Practice Quiz Center */
+        .quiz-container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            text-align: center;
+        }
+
+        .quiz-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            margin-top: 15px;
+        }
+
+        .quiz-question {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-opt-btn {
+            background: var(--paper-bg);
+            border: 2px solid var(--card-border);
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quiz-opt-btn:hover {
+            border-color: var(--primary);
+            background: rgba(2, 132, 199, 0.05);
+        }
+
+        .quiz-score-board {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(2, 132, 199, 0.08);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Bottom Controls Bar */
+        .bottom-navbar {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--card-border);
+        }
+
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-indicator {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-main);
+            background: var(--paper-bg);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+        }
+
+        /* Toast Message Notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #334155;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 640px) {
+            .app-container {
+                padding: 5px;
+            }
+
+            .top-navbar {
+                padding: 8px 12px;
+            }
+
+            .brand-logo span {
+                display: none;
+            }
+
+            .book-viewport {
+                min-height: 500px;
+            }
+
+            .page-content {
+                padding: 18px 12px;
+            }
+
+            .cover-title-box h1 {
+                font-size: 2.2rem;
+            }
+
+            .cover-title-box h2 {
+                font-size: 1.4rem;
+            }
+
+            .cover-illustration {
+                width: 150px;
+                height: 150px;
+            }
+
+            .big-letter-box {
+                font-size: 5rem;
+                width: 120px;
+                height: 120px;
+            }
+
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-btn span {
+                display: none;
+            }
+
+            .nav-btn {
+                padding: 10px 14px;
+            }
+        }
+
+        /* Print Media Style */
+        @media print {
+            .top-navbar, .bottom-navbar, .progress-container, .btn-audio-play, .icon-btn {
+                display: none !important;
+            }
+            .book-viewport {
+                border: none;
+                box-shadow: none;
+                width: 100%;
+            }
+            .page-content {
+                display: block !important;
+                opacity: 1 !important;
+                transform: none !important;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Top Navigation Bar -->
+        <header class="top-navbar">
+            <div class="brand-logo" onclick="goToPage(0)">
+                <i class="fa-solid fa-book-open-reader"></i>
+                <span>শিশু শিক্ষা</span>
+            </div>
+            
+            <div class="nav-controls">
+                <button class="icon-btn" title="সূচিপত্র" onclick="goToPage(1)"><i class="fa-solid fa-list-ul"></i></button>
+                <button class="icon-btn" title="বুকমার্ক" onclick="toggleBookmark()"><i id="bookmark-icon" class="fa-regular fa-bookmark"></i></button>
+                <button class="icon-btn" title="ফন্ট ছোট করুন" onclick="changeFontSize(-1)">A-</button>
+                <button class="icon-btn" title="ফন্ট বড় করুন" onclick="changeFontSize(1)">A+</button>
+                <button class="icon-btn" title="ডার্ক/লাইট মোড" onclick="toggleDarkMode()"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+                <button class="icon-btn" title="ফুলস্ক্রিন" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
+                <button class="icon-btn" title="প্রিন্ট করুন" onclick="window.print()"><i class="fa-solid fa-print"></i></button>
+            </div>
+        </header>
+
+        <!-- Reading Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Main Book Outer Container -->
+        <main class="book-wrapper">
+            <div class="book-viewport" id="book-viewport">
+                
+                <!-- Page 0: Cover Page -->
+                <section class="page-content cover-page active" id="page-0">
+                    <div class="cover-title-box">
+                        <h1>শিশু শিক্ষা</h1>
+                        <h2>বাংলা বর্ণমালা</h2>
+                        <p style="color: var(--text-muted); font-size: 1.1rem;">স্বরবর্ণ, ব্যঞ্জনবর্ণ ও চমৎকার সব মজার শিক্ষা</p>
+                    </div>
+
+                    <!-- Embedded SVG Illustration for Cover -->
+                    <svg class="cover-illustration" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="90" fill="#E0F2FE"/>
+                        <path d="M50 140 C 70 110, 130 110, 150 140" stroke="#0284C7" stroke-width="8" stroke-linecap="round"/>
+                        <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-size="60" font-weight="bold" fill="#0284C7" font-family="Hind Siliguri">অ</text>
+                        <text x="75%" y="65%" dominant-baseline="middle" text-anchor="middle" font-size="45" font-weight="bold" fill="#F59E0B" font-family="Hind Siliguri">ক</text>
+                        <circle cx="140" cy="50" r="15" fill="#10B981"/>
+                    </svg>
+
+                    <div class="author-box">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        <span>লেখক: </span>
+                        <input type="text" id="author-name" value="ডিজিটাল শিক্ষক" onchange="saveAuthorName(this.value)">
+                    </div>
+
+                    <div>
+                        <button class="btn-start" onclick="nextPage()">
+                            বই পড়া শুরু করুন <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Page 1: Table of Contents -->
+                <section class="page-content" id="page-1">
+                    <h2 style="font-size: 2rem; color: var(--primary); text-align: center; margin-bottom: 20px;">
+                        <i class="fa-solid fa-book-bookmark"></i> সূচিপত্র
+                    </h2>
+                    <div class="toc-grid">
+                        <div class="toc-card" onclick="goToPage(2)">
+                            <div class="toc-icon"><i class="fa-solid fa-info-circle"></i></div>
+                            <div class="toc-info">
+                                <h3>১. বাংলা ভাষার পরিচিতি</h3>
+                                <p>আমাদের মাতৃভাষা বাংলা</p>
+                            </div>
+                        </div>
+
+                        <div class="toc-card" onclick="goToPage(3)">
+                            <div class="toc-icon"><i class="fa-solid fa-font"></i></div>
+                            <div class="toc-info">
+                                <h3>২. স্বরবর্ণ পরিচিতি</h3>
+                                <p>অ থেকে ঔ পর্যন্ত (১১টি वर्ण)</p>
+                            </div>
+                        </div>
+
+                        <div class="toc-card" onclick="goToPage(15)">
+                            <div class="toc-icon"><i class="fa-solid fa-cubes"></i></div>
+                            <div class="toc-info">
+                                <h3>৩. ব্যঞ্জনবর্ণ পরিচিতি</h3>
+                                <p>ক থেকে ঁ পর্যন্ত (৩৯টি বর্ণ)</p>
+                            </div>
+                        </div>
+
+                        <div class="toc-card" onclick="goToPage(55)">
+                            <div class="toc-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+                            <div class="toc-info">
+                                <h3>৪. কারচিহ্ন পরিচিতি</h3>
+                                <p>া, ি, ী সহ সকল কারচিহ্ন</p>
+                            </div>
+                        </div>
+
+                        <div class="toc-card" onclick="goToPage(56)">
+                            <div class="toc-icon"><i class="fa-solid fa-spell-check"></i></div>
+                            <div class="toc-info">
+                                <h3>৫. সহজ শব্দ ও বাক্য</h3>
+                                <p>মজার মজার বাংলা বাক্য গঠন</p>
+                            </div>
+                        </div>
+
+                        <div class="toc-card" onclick="goToPage(57)">
+                            <div class="toc-icon"><i class="fa-solid fa-gamepad"></i></div>
+                            <div class="toc-info">
+                                <h3>৬. অনুশীলন ও মূল্যায়ন</h3>
+                                <p>কুইজ ও বর্ণ চেনার খেলা</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Page 2: Introduction to Bengali Language -->
+                <section class="page-content" id="page-2">
+                    <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;">১. বাংলা ভাষার পরিচিতি</h2>
+                    <div style="line-height: 1.8; font-size: 1.15rem; color: var(--text-main);">
+                        <p style="margin-bottom: 15px;">
+                            বাংলা আমাদের মাতৃভাষা। আমরা বাংলায় কথা বলি, মনের ভাব প্রকাশ করি। বাংলা বর্ণমালায় মোট <strong>৫০টি</strong> মূল বর্ণ রয়েছে।
+                        </p>
+                        <div style="background: rgba(2,132,199,0.06); padding: 20px; border-radius: 16px; border-left: 5px solid var(--primary); margin-bottom: 20px;">
+                            <h3 style="color: var(--primary); margin-bottom: 8px;">বর্ণমালাকে দুই ভাগে ভাগ করা হয়েছে:</h3>
+                            <ul style="margin-left: 20px;">
+                                <li style="margin-bottom: 8px;"><strong>১. স্বরবর্ণ (১১টি):</strong> যে সকল বর্ণ অন্য বর্ণের সাহায্য ছাড়াই নিজে নিজে উচ্চারিত হতে পারে।</li>
+                                <li><strong>২. ব্যঞ্জনবর্ণ (৩৯টি):</strong> যে সকল বর্ণ স্বরবর্ণের সাহায্য ছাড়া স্পষ্ট উচ্চারিত হতে পারে না।</li>
+                            </ul>
+                        </div>
+                        <p>
+                            এসো আমরা আনন্দ নিয়ে এক এক করে সব বাংলা বর্ণ শিখে নিই!
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Dynamic Single Letter Container pages will be generated here by JS or handled via dynamic Page Views -->
+                <section class="page-content" id="dynamic-letter-page">
+                    <!-- Dynamic Content Inserted via JS -->
+                </section>
+
+                <!-- Page: Kar Chinha -->
+                <section class="page-content" id="kar-page">
+                    <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;">৪. কারচিহ্ন পরিচিতি</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 15px;">স্বরবর্ণের সংক্ষিপ্ত রূপকে 'কার' বলে। ব্যঞ্জনবর্ণের সাথে কারচিহ্ন যুক্ত হয়ে শব্দ তৈরি হয়।</p>
+                    <div class="kar-grid" id="kar-grid-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Page: Sentence / Word Building -->
+                <section class="page-content" id="sentence-page">
+                    <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;">৫. সহজ শব্দ ও বাক্য গঠন</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">ছোট ছোট শব্দ থেকে বাক্য তৈরি করতে শিখি:</p>
+                    <div id="sentence-list-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Page: Practice Center -->
+                <section class="page-content" id="quiz-page">
+                    <h2 style="font-size: 2rem; color: var(--primary); text-align: center; margin-bottom: 5px;">৬. অনুশীলন ও মূল্যায়ন</h2>
+                    <p style="text-align: center; color: var(--text-muted); margin-bottom: 15px;">সঠিক উত্তর নির্বাচন করে তোমার মেধা পরীক্ষা করো!</p>
+                    
+                    <div class="quiz-container">
+                        <div class="quiz-score-board">
+                            <span>স্কোর: <strong id="quiz-score" style="color: var(--accent);">০</strong></span>
+                            <span>প্রশ্ন: <strong id="quiz-progress">১/৫</strong></span>
+                        </div>
+
+                        <div class="quiz-card">
+                            <div class="quiz-question" id="quiz-question-text">প্রশ্ন লোড হচ্ছে...</div>
+                            <div class="quiz-options" id="quiz-options-container">
+                                <!-- Options dynamically rendered -->
+                            </div>
+                            <button class="btn-start" style="padding: 10px 25px; font-size: 1.1rem;" onclick="generateQuizQuestion()">পরবর্তী প্রশ্ন <i class="fa-solid fa-arrows-rotate"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <!-- Bottom Page Controls Navigation -->
+        <footer class="bottom-navbar">
+            <button class="nav-btn" id="btn-prev" onclick="prevPage()">
+                <i class="fa-solid fa-chevron-left"></i> <span>আগের পৃষ্ঠা</span>
+            </button>
+
+            <div class="page-indicator">
+                <span id="current-page-num">১</span> / <span id="total-pages-num">৫৭</span>
+            </div>
+
+            <button class="nav-btn" id="btn-next" onclick="nextPage()">
+                <span>পরের পৃষ্ঠা</span> <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Notification Toast Element -->
+    <div class="toast" id="toast-msg">বার্তা</div>
+
+    <script>
+        /* ==========================================================
+           DATA STRUCTURES: Swaraborno, Byanjanborno, Kar, Sentences
+           ========================================================== */
+        
+        const swarabornoData = [
+            { letter: 'অ', pron: 'অ-তে অজগর', word: 'অজগর', mean: 'অজগরটি আসছে তেড়ে', svg: `<svg viewBox="0 0 100 100"><path d="M10 50 Q 30 20, 50 50 T 90 50" stroke="#0284c7" stroke-width="8" fill="none"/><circle cx="85" cy="45" r="4" fill="#ef4444"/></svg>` },
+            { letter: 'আ', pron: 'আ-তে আম', word: 'আম', mean: 'আমটি খাবো পেড়ে', svg: `<svg viewBox="0 0 100 100"><path d="M50 20 C 20 20, 20 80, 50 85 C 80 80, 80 20, 50 20 Z" fill="#f59e0b"/><path d="M50 20 Q 55 10, 60 5" stroke="#10b981" stroke-width="4"/></svg>` },
+            { letter: 'ই', pron: 'ই-তে ইঁদুর', word: 'ইঁদুর', mean: 'ইঁদুর ছানা ভয়ে মরে', svg: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="60" rx="30" ry="20" fill="#64748b"/><circle cx="70" cy="50" r="5" fill="#000"/><path d="M20 60 Q 10 60, 5 50" stroke="#64748b" stroke-width="3" fill="none"/></svg>` },
+            { letter: 'ঈ', pron: 'ঈ-তে ঈগল', word: 'ঈগল', mean: 'ঈগল পাখি আকাশে ওড়ে', svg: `<svg viewBox="0 0 100 100"><path d="M20 50 Q 50 10, 80 50 Q 50 70, 20 50 Z" fill="#0284c7"/><polygon points="80,50 95,55 80,60" fill="#f59e0b"/></svg>` },
+            { letter: 'উ', pron: 'উ-তে উট', word: 'উট', mean: 'উট চলেছে মুখটি তুলে', svg: `<svg viewBox="0 0 100 100"><circle cx="40" cy="40" r="20" fill="#f59e0b"/><rect x="30" y="50" width="40" height="30" rx="10" fill="#f59e0b"/></svg>` },
+            { letter: 'ঊ', pron: 'ঊ-তে ঊষা', word: 'ঊষা', mean: 'ঊষা ওঠে পুব আকাশে', svg: `<svg viewBox="0 0 100 100"><path d="M10 70 A 40 40 0 0 1 90 70 Z" fill="#ef4444"/><line x1="0" y1="70" x2="100" y2="70" stroke="#0284c7" stroke-width="4"/></svg>` },
+            { letter: 'ঋ', pron: 'ঋ-তে ঋষি', word: 'ঋষি', mean: 'ঋষি মশাই মশগুল ধ্যানে', svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="18" fill="#f59e0b"/><path d="M30 80 Q 50 60, 70 80 Z" fill="#0284c7"/></svg>` },
+            { letter: 'এ', pron: 'এ-তে একতারা', word: 'একতারা', mean: 'একতারাটি বাজে সুরে', svg: `<svg viewBox="0 0 100 100"><polygon points="50,15 35,80 65,80" fill="#f59e0b"/><line x1="50" y1="15" x2="50" y2="80" stroke="#000" stroke-width="2"/></svg>` },
+            { letter: 'ঐ', pron: 'ঐ-তে ঐরাবত', word: 'ঐরাবত', mean: 'ঐরাবত ঐ আসছে হেলে', svg: `<svg viewBox="0 0 100 100"><rect x="25" y="35" width="50" height="35" rx="15" fill="#64748b"/><path d="M30 50 Q 20 70, 25 80" stroke="#64748b" stroke-width="6" fill="none"/></svg>` },
+            { letter: 'ও', pron: 'ও-তে ওল', word: 'ওল', mean: 'ওল খেও না ধরবে গলা', svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="28" fill="#84cc16"/><path d="M50 27 L 50 15" stroke="#10b981" stroke-width="4"/></svg>` },
+            { letter: 'ঔ', pron: 'ঔ-তে ঔষধ', word: 'ঔষধ', mean: 'ঔষধ খেলে রোগ সারে', svg: `<svg viewBox="0 0 100 100"><rect x="35" y="25" width="30" height="55" rx="10" fill="#ef4444"/><rect x="40" y="15" width="20" height="10" rx="3" fill="#64748b"/></svg>` }
+        ];
+
+        const byanjanbornoData = [
+            { letter: 'ক', pron: 'ক-তে কলম', word: 'কলম', mean: 'কলম দিয়ে লেখা হয়' },
+            { letter: 'খ', pron: 'খ-তে খরগোশ', word: 'খরগোশ', mean: 'খরগোশটি লাফিয়ে চলে' },
+            { letter: 'গ', pron: 'গ-তে গরু', word: 'গরু', mean: 'গরু আমাদের দুধ দেয়' },
+            { letter: 'ঘ', pron: 'ঘ-তে ঘাস', word: 'ঘাস', mean: 'সবুজ ঘাস মাঠে দোলে' },
+            { letter: 'ঙ', pron: 'ঙ-তে ব্যাঙ', word: 'ব্যাঙ', mean: 'ব্যাঙ ডাকে বর্ষাকালে' },
+            { letter: 'চ', pron: 'চ-তে চাঁদ', word: 'চাঁদ', mean: 'আকাশে সুন্দর চাঁদ ওঠে' },
+            { letter: 'ছ', pron: 'ছ-তে ছাতা', word: 'ছাতা', mean: 'বৃষ্টি হলে ছাতা লাগে' },
+            { letter: 'জ', pron: 'জ-তে জাহাজ', word: 'জাহাজ', mean: 'জাহাজ চলে সাগর জলে' },
+            { letter: 'ঝ', pron: 'ঝ-তে ঝর্ণা', word: 'ঝর্ণা', mean: 'পাহাড় থেকে ঝর্ণা বহে' },
+            { letter: 'ঞ', pron: 'ঞ-তে মিঞা', word: 'মিঞা', mean: 'মিঞা ভাই গান গায়' },
+            { letter: 'ট', pron: 'ট-তে টাকা', word: 'টাকা', mean: 'টাকা দিয়ে জিনিস কেনা হয়' },
+            { letter: 'ঠ', pron: 'ঠ-তে ঠেলাগাড়ি', word: 'ঠেলাগাড়ি', mean: 'ঠেলাগাড়ি মালামাল বয়' },
+            { letter: 'ড', pron: 'ড-তে ডাব', word: 'ডাব', mean: 'ডাবের পানি ডালিম মিষ্টি' },
+            { letter: 'ঢ', pron: 'ঢ-তে ঢাক', word: 'ঢাক', mean: 'ঢাক বাজে তালের সাথে' },
+            { letter: 'ণ', pron: 'ণ-তে হরিণ', word: 'হরিণ', mean: 'হরিণ থাকে সুন্দরবনে' },
+            { letter: 'ত', pron: 'ত-তে তরমুজ', word: 'তরমুজ', mean: 'রসালো ফল তরমুজ' },
+            { letter: 'থ', pron: 'থ-তে থালা', word: 'থালা', mean: 'থালায় ভরা খাবার আছে' },
+            { letter: 'দ', pron: 'দ-তে দোয়েল', word: 'দোয়েল', mean: 'আমাদের জাতীয় পাখি দোয়েল' },
+            { letter: 'ধ', pron: 'ধ-তে ধান', word: 'ধান', mean: 'সোনার ধান মাঠে হাসে' },
+            { letter: 'ন', pron: 'ন-তে নদী', word: 'নদী', mean: 'নদী চলে আপন বেগে' },
+            { letter: 'প', pron: 'প-তে পাখি', word: 'পাখি', mean: 'পাখি গায় গাছের ডালে' },
+            { letter: 'ফ', pron: 'ফ-তে ফুল', word: 'ফুল', mean: 'লাল গোলাপ সুন্দর ফুল' },
+            { letter: 'ব', pron: 'ব-তে বই', word: 'বই', mean: 'বই পড়লে জ্ঞান বাড়ে' },
+            { letter: 'ভ', pron: 'ভ-তে ভালুক', word: 'ভালুক', mean: 'ভালুক নাচে বনের ভেতর' },
+            { letter: 'ম', pron: 'ম-তে মাছ', word: 'মাছ', mean: 'মাছ থাকে নদীর জলে' },
+            { letter: 'য', pron: 'য-তে যাতা', word: 'যাতা', mean: 'যাতা ঘোরে হাতের টানে' },
+            { letter: 'র', pron: 'র-তে রথ', word: 'রথ', mean: 'রথ টানে মেলার মাঝে' },
+            { letter: 'ল', pron: 'ল-তে লতা', word: 'লতা', mean: 'সবুজ লতা গাছে ওঠে' },
+            { letter: 'শ', pron: 'শ-তে শাপলা', word: 'শাপলা', mean: 'শাপলা আমাদের জাতীয় ফুল' },
+            { letter: 'ষ', pron: 'ষ-তে ষাঁড়', word: 'ষাঁড়', mean: 'ষাঁড় চলে মেঠো পথে' },
+            { letter: 'স', pron: 'স-তে সিংহ', word: 'সিংহ', mean: 'সিংহ হলো বনের রাজা' },
+            { letter: 'হ', pron: 'হ-তে হাতি', word: 'হাতি', mean: 'হাতি চলে ধীরে ধীরে' },
+            { letter: 'ড়', pron: 'ড়-তে গাড়ি', word: 'গাড়ি', mean: 'গাড়ি চলে রাস্তা দিয়ে' },
+            { letter: 'ঢ়', pron: 'ঢ়-তে আষাঢ়', word: 'আষাঢ়', mean: 'আষাঢ় মাসে বৃষ্টি হয়' },
+            { letter: 'য়', pron: 'য়-তে ময়না', word: 'ময়না', mean: 'ময়না পাখি কথা বলে' },
+            { letter: 'ৎ', pron: 'ৎ-তে সৎ', word: 'সৎ', mean: 'সদা সত্য কথা বলবে' },
+            { letter: 'ং', pron: 'ং-তে সং', word: 'সং', mean: 'সং সেজেছে হাসাতে সবাইকে' },
+            { letter: 'ঃ', pron: 'ঃ-তে দুঃখ', word: 'দুঃখ', mean: 'কারো দুখে দুঃখী হও' },
+            { letter: 'ঁ', pron: 'ঁ-তে চাঁদ', word: 'চাঁদ', mean: 'চাঁদের আলো স্নিগ্ধ অতি' }
+        ];
+
+        const karData = [
+            { symbol: 'া', name: ' আকার', ex: 'ক + া = কা (কাক)' },
+            { symbol: 'ি', name: ' ইকার', ex: 'ক + ি = কি (কিরণ)' },
+            { symbol: 'ী', name: ' ঈকার', ex: 'ক + ী = কী (কীট)' },
+            { symbol: 'ু', name: ' উকার', ex: 'ক + ু = কু (কুল)' },
+            { symbol: 'ূ', name: ' ঊকার', ex: 'ক + ূ = কূ (কূপ)' },
+            { symbol: 'ৃ', name: ' ঋকার', ex: 'ক + ৃ = কৃ (কৃষি)' },
+            { symbol: 'ে', name: ' একার', ex: 'ক + ে = কে (কেশ)' },
+            { symbol: 'ৈ', name: ' ঐকার', ex: 'ক + ৈ = কৈ (কৈলাশ)' },
+            { symbol: 'ো', name: ' ওকার', ex: 'ক + ো = কো (কোণ)' },
+            { symbol: 'ৌ', name: ' ঔকার', ex: 'ক + ৌ = কৌ (কৌতুক)' }
+        ];
+
+        const sentencesData = [
+            { title: 'অজগর', sentence: 'অজগরটি বড় গাছে থাকে।', icon: 'fa-dragon' },
+            { title: 'আম', sentence: 'মিষ্টি আম খেতে খুব মজা।', icon: 'fa-apple-whole' },
+            { title: 'ইঁদুর', sentence: 'ইঁদুর ছানা ভয় পেয়ে পালায়।', icon: 'fa-bugs' },
+            { title: 'উট', sentence: 'উট চলেছে মরুভূমির পথে।', icon: 'fa-compass' },
+            { title: 'কলম', sentence: 'কলম দিয়ে আমরা পড়া লিখি।', icon: 'fa-pen' },
+            { title: 'বই', sentence: 'প্রতিদিন নতুন বই পড়া ভালো।', icon: 'fa-book' },
+            { title: 'মানুষ', sentence: 'মানুষের সেবা করা পরম ধর্ম।', icon: 'fa-user-group' },
+            { title: 'বাংলাদেশ', sentence: 'আমাদের প্রিয় জন্মভূমি বাংলাদেশ।', icon: 'fa-flag' }
+        ];
+
+        /* ==========================================================
+           STATE MANAGEMENT
+           ========================================================== */
+        let currentPage = 0;
+        const totalPages = 58; // 0 Cover, 1 TOC, 2 Intro, 3-13 Swar, 14 SwarGrid, 15-53 Byanjan, 54 ByanjanGrid, 55 Kar, 56 Sentences, 57 Quiz
+        let fontSize = 16;
+        let isDarkMode = false;
+        let quizScore = 0;
+        let quizCount = 1;
+        let currentQuizAnswer = '';
+
+        /* ==========================================================
+           INITIALIZATION & EVENT LISTENERS
+           ========================================================== */
+        window.onload = function() {
+            loadSavedState();
+            renderKarPage();
+            renderSentencesPage();
+            generateQuizQuestion();
+            updatePageDisplay();
+
+            // Keyboard Navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === 'Space') {
+                    nextPage();
+                } else if (e.key === 'ArrowLeft') {
+                    prevPage();
+                }
+            });
+        };
+
+        /* ==========================================================
+           NAVIGATION & PAGE RENDERER LOGIC
+           ========================================================== */
+        function updatePageDisplay() {
+            // Update Page Indicator
+            document.getElementById('current-page-num').innerText = toBengaliNum(currentPage + 1);
+            document.getElementById('total-pages-num').innerText = toBengaliNum(totalPages);
+
+            // Progress bar
+            const pct = (currentPage / (totalPages - 1)) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+
+            // Disable/Enable Nav buttons
+            document.getElementById('btn-prev').disabled = (currentPage === 0);
+            document.getElementById('btn-next').disabled = (currentPage === totalPages - 1);
+
+            // Hide static pages
+            document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+
+            // Route dynamic vs static
+            if (currentPage === 0) {
+                document.getElementById('page-0').classList.add('active');
+            } else if (currentPage === 1) {
+                document.getElementById('page-1').classList.add('active');
+            } else if (currentPage === 2) {
+                document.getElementById('page-2').classList.add('active');
+            } else if (currentPage >= 3 && currentPage <= 13) {
+                // Swaraborno Single Views
+                renderDynamicLetter(swarabornoData[currentPage - 3], 'স্বরবর্ণ');
+            } else if (currentPage === 14) {
+                // Swaraborno Overview Grid
+                renderLetterGrid(swarabornoData, 'স্বরবর্ণ পরিচিতি (সমষ্টি)', 3);
+            } else if (currentPage >= 15 && currentPage <= 53) {
+                // Byanjanborno Single Views
+                renderDynamicLetter(byanjanbornoData[currentPage - 15], 'ব্যঞ্জনবর্ণ');
+            } else if (currentPage === 54) {
+                // Byanjanborno Overview Grid
+                renderLetterGrid(byanjanbornoData, 'ব্যঞ্জনবর্ণ পরিচিতি (সমষ্টি)', 15);
+            } else if (currentPage === 55) {
+                document.getElementById('kar-page').classList.add('active');
+            } else if (currentPage === 56) {
+                document.getElementById('sentence-page').classList.add('active');
+            } else if (currentPage === 57) {
+                document.getElementById('quiz-page').classList.add('active');
+            }
+
+            // Save Progress
+            localStorage.setItem('shishu_sk_page', currentPage);
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                updatePageDisplay();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                updatePageDisplay();
+            }
+        }
+
+        function goToPage(pageIdx) {
+            currentPage = pageIdx;
+            updatePageDisplay();
+        }
+
+        /* ==========================================================
+           DYNAMIC TEMPLATE RENDERERS
+           ========================================================== */
+        function renderDynamicLetter(item, category) {
+            const pageContainer = document.getElementById('dynamic-letter-page');
+            pageContainer.innerHTML = `
+                <div class="letter-view-container">
+                    <div class="letter-header">
+                        <span class="letter-badge">${category}</span>
+                        <span style="font-size:1.1rem; color:var(--text-muted);">বর্ণ উচ্চারণ ও শব্দ গঠন</span>
+                    </div>
+
+                    <div class="main-letter-display">
+                        <div class="big-letter-box">${item.letter}</div>
+                        <div class="letter-meta">
+                            <div class="letter-pronunciation">${item.pron}</div>
+                            <button class="btn-audio-play" onclick="speakText('${item.letter}, ${item.pron}')">
+                                <i class="fa-solid fa-volume-high"></i> উচ্চারণ শোনো
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="word-examples-grid">
+                        <div class="word-card" style="grid-column: 1 / -1;">
+                            ${item.svg ? item.svg : '<i class="fa-solid fa-shapes" style="font-size:3rem; color:var(--primary); margin-bottom:10px;"></i>'}
+                            <div class="word-title">${item.word}</div>
+                            <div class="word-meaning">${item.mean}</div>
+                            <button class="btn-audio-play" style="margin-top:10px; padding:6px 16px; font-size:0.9rem;" onclick="speakText('${item.word}. ${item.mean}')">
+                                <i class="fa-solid fa-play"></i> শুনুন
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            pageContainer.classList.add('active');
+        }
+
+        function renderLetterGrid(dataList, title, startPageIndex) {
+            const pageContainer = document.getElementById('dynamic-letter-page');
+            let gridHtml = dataList.map((item, idx) => `
+                <div class="grid-letter-item" onclick="goToPage(${startPageIndex + idx})">
+                    ${item.letter}
+                </div>
+            `).join('');
+
+            pageContainer.innerHTML = `
+                <div>
+                    <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;">${title}</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 15px;">যে কোনো বর্ণে ক্লিক করে বিস্তারিত শিখুন:</p>
+                    <div class="letters-grid">${gridHtml}</div>
+                </div>
+            `;
+            pageContainer.classList.add('active');
+        }
+
+        function renderKarPage() {
+            const container = document.getElementById('kar-grid-container');
+            container.innerHTML = karData.map(k => `
+                <div class="kar-card">
+                    <div class="kar-symbol">${k.symbol}</div>
+                    <div>
+                        <h3 style="font-size:1.3rem; color:var(--primary);">${k.symbol} (${k.name})</h3>
+                        <p style="color:var(--text-muted); font-size:1rem; margin-top:4px;">${k.ex}</p>
+                        <button class="btn-audio-play" style="padding:4px 12px; font-size:0.85rem; margin-top:8px;" onclick="speakText('${k.name}, ${k.ex}')">
+                            <i class="fa-solid fa-volume-high"></i> শোনো
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSentencesPage() {
+            const container = document.getElementById('sentence-list-container');
+            container.innerHTML = sentencesData.map(s => `
+                <div class="sentence-card">
+                    <div class="sentence-illustration" style="display:flex; align-items:center; justify-content:center; background:rgba(2,132,199,0.1); border-radius:12px;">
+                        <i class="fa-solid ${s.icon}" style="font-size:2.5rem; color:var(--primary);"></i>
+                    </div>
+                    <div class="sentence-text">
+                        <h3>${s.title}</h3>
+                        <p>${s.sentence}</p>
+                        <button class="btn-audio-play" style="padding:4px 12px; font-size:0.85rem; margin-top:8px;" onclick="speakText('${s.sentence}')">
+                            <i class="fa-solid fa-volume-high"></i> পড়ুন
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* ==========================================================
+           PRACTICE / QUIZ SYSTEM LOGIC
+           ========================================================== */
+        function generateQuizQuestion() {
+            const allLetters = [...swarabornoData, ...byanjanbornoData];
+            const target = allLetters[Math.floor(Math.random() * allLetters.length)];
+            currentQuizAnswer = target.letter;
+
+            document.getElementById('quiz-question-text').innerText = `'${target.word}' শব্দটির প্রথম বর্ণ কোনটি?`;
+
+            // Pick 3 random distractors
+            let options = [target.letter];
+            while (options.length < 4) {
+                let randomLetter = allLetters[Math.floor(Math.random() * allLetters.length)].letter;
+                if (!options.includes(randomLetter)) {
+                    options.push(randomLetter);
+                }
+            }
+
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = options.map(opt => `
+                <button class="quiz-opt-btn" onclick="checkAnswer('${opt}', this)">${opt}</button>
+            `).join('');
+        }
+
+        function checkAnswer(selected, btn) {
+            if (selected === currentQuizAnswer) {
+                btn.style.background = '#10b981';
+                btn.style.color = 'white';
+                quizScore += 10;
+                showToast(' চমৎকার! সঠিক উত্তর!');
+                speakText('সাবাশ! সঠিক হয়েছে');
+            } else {
+                btn.style.background = '#ef4444';
+                btn.style.color = 'white';
+                showToast(' ভুল উত্তর! আবার চেষ্টা করো।');
+                speakText('ভুল হয়েছে');
+            }
+
+            document.getElementById('quiz-score').innerText = toBengaliNum(quizScore);
+
+            // Disable all buttons after choice
+            document.querySelectorAll('.quiz-opt-btn').forEach(b => b.disabled = true);
+        }
+
+        /* ==========================================================
+           WEB SPEECH AUDIO UTILITY
+           ========================================================== */
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop current speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'bn-BD';
+                utterance.rate = 0.8; // Friendly slow pace for kids
+
+                // Fallback check for voice load
+                const voices = window.speechSynthesis.getVoices();
+                const bnVoice = voices.find(v => v.lang.includes('bn'));
+                if (bnVoice) {
+                    utterance.voice = bnVoice;
+                }
+
+                utterance.onerror = function() {
+                    showToast('অডিও প্লে করতে সমস্যা হয়েছে');
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                showToast('আপনার ব্রাউজারে অডিও সুবিধা সমর্থিত নয়');
+            }
+        }
+
+        /* ==========================================================
+           UTILITY FUNCTIONS: Dark Mode, Font Size, Bookmarks
+           ========================================================== */
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            const icon = document.getElementById('theme-icon');
+            icon.className = isDarkMode ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            localStorage.setItem('shishu_sk_dark', isDarkMode);
+        }
+
+        function changeFontSize(delta) {
+            fontSize = Math.min(Math.max(fontSize + delta, 13), 22);
+            document.documentElement.style.setProperty('--font-size-base', fontSize + 'px');
+            localStorage.setItem('shishu_sk_font', fontSize);
+        }
+
+        function toggleBookmark() {
+            const icon = document.getElementById('bookmark-icon');
+            const isBookmarked = icon.classList.contains('fa-solid');
+            if (isBookmarked) {
+                icon.className = 'fa-regular fa-bookmark';
+                showToast('বুকমার্ক সরানো হয়েছে');
+                localStorage.removeItem('shishu_sk_bookmark');
+            } else {
+                icon.className = 'fa-solid fa-bookmark';
+                localStorage.setItem('shishu_sk_bookmark', currentPage);
+                showToast(`পৃষ্ঠা ${toBengaliNum(currentPage + 1)} বুকমার্ক করা হয়েছে`);
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    showToast('ফুলস্ক্রিন সক্রিয় করা যায়নি');
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function saveAuthorName(val) {
+            localStorage.setItem('shishu_sk_author', val);
+            showToast('লেখকের নাম সংরক্ষিত হয়েছে');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        function toBengaliNum(num) {
+            const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            return num.toString().split('').map(d => bnNums[d] || d).join('');
+        }
+
+        function loadSavedState() {
+            const savedPage = localStorage.getItem('shishu_sk_page');
+            if (savedPage !== null) {
+                currentPage = parseInt(savedPage, 10);
+            }
+
+            const savedDark = localStorage.getItem('shishu_sk_dark');
+            if (savedDark === 'true') {
+                toggleDarkMode();
+            }
+
+            const savedFont = localStorage.getItem('shishu_sk_font');
+            if (savedFont !== null) {
+                fontSize = parseInt(savedFont, 10);
+                document.documentElement.style.setProperty('--font-size-base', fontSize + 'px');
+            }
+
+            const savedAuthor = localStorage.getItem('shishu_sk_author');
+            if (savedAuthor !== null) {
+                document.getElementById('author-name').value = savedAuthor;
+            }
+        }
+    </script>
+</body>
+</html>
